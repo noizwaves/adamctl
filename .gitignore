@@ -8,7 +8,8 @@
 *.so
 *.dylib
 
-cmd/adamctl_date/adamctl_date
+# Repo specific binaries
+adamctl_date
 
 # Test binary, built with `go test -c`
 *.test
