@@ -13,7 +13,8 @@ func TestRun(t *testing.T) {
 	var out bytes.Buffer
 	run(&out, now)
 
-	expected := `Current: Fri Jun  9 16:22:45 MDT 2023
+	expected := `Fri Jun  9 16:22:45 MDT 2023
+
 UTC: Fri Jun  9 22:22:45 UTC 2023
 Los Angeles: Fri Jun  9 15:22:45 PDT 2023
 Denver: Fri Jun  9 16:22:45 MDT 2023

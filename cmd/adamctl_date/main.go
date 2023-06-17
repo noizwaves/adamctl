@@ -25,7 +25,8 @@ func run(out io.Writer, t time.Time) {
 		panic(err)
 	}
 
-	fmt.Fprintf(out, "Current: %v\n", t.Format(time.UnixDate))
+	fmt.Fprintf(out, "%v\n\n", t.Format(time.UnixDate))
+
 	fmt.Fprintf(out, "UTC: %v\n", t.UTC().Format(time.UnixDate))
 	fmt.Fprintf(out, "Los Angeles: %v\n", t.In(losAngeles).Format(time.UnixDate))
 	fmt.Fprintf(out, "Denver: %v\n", t.In(denver).Format(time.UnixDate))
