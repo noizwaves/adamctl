@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-type cityTimezone struct {
+type place struct {
 	Name     string
 	Location *time.Location
 }
 
-func getCities() (*[]cityTimezone, error) {
+func getPlaces() (*[]place, error) {
 	desired := [](struct {
 		Display  string
 		Timezone string
@@ -23,29 +23,29 @@ func getCities() (*[]cityTimezone, error) {
 		{"Turkey", "Turkey"},
 	}
 
-	cities := make([]cityTimezone, 0)
+	cities := make([]place, 0)
 	for _, city := range desired {
 		location, err := time.LoadLocation(city.Timezone)
 		if err != nil {
 			return nil, err
 		}
-		cities = append(cities, cityTimezone{city.Display, location})
+		cities = append(cities, place{city.Display, location})
 	}
 
 	return &cities, nil
 }
 
 func run(out io.Writer, t time.Time) {
-	cities, err := getCities()
+	places, err := getPlaces()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("%v\n", *cities)
+	fmt.Printf("%v\n", *places)
 	fmt.Fprintf(out, "%v\n\n", t.Format(time.UnixDate))
 	fmt.Fprintf(out, "UTC: %v\n", t.UTC().Format(time.UnixDate))
-	for _, c := range *cities {
-		fmt.Fprintf(out, "%s: %s\n", c.Name, t.In(c.Location).Format(time.UnixDate))
+	for _, p := range *places {
+		fmt.Fprintf(out, "%s: %s\n", p.Name, t.In(p.Location).Format(time.UnixDate))
 	}
 }
 
