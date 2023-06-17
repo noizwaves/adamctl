@@ -7,31 +7,46 @@ import (
 	"time"
 )
 
+type cityTimezone struct {
+	Name     string
+	Location *time.Location
+}
+
+func getCities() (*[]cityTimezone, error) {
+	desired := [](struct {
+		Display  string
+		Timezone string
+	}){
+		{"Los Angeles", "America/Los_Angeles"},
+		{"Denver", "America/Denver"},
+		{"New York", "America/New_York"},
+		{"Turkey", "Turkey"},
+	}
+
+	cities := make([]cityTimezone, 0)
+	for _, city := range desired {
+		location, err := time.LoadLocation(city.Timezone)
+		if err != nil {
+			return nil, err
+		}
+		cities = append(cities, cityTimezone{city.Display, location})
+	}
+
+	return &cities, nil
+}
+
 func run(out io.Writer, t time.Time) {
-	losAngeles, err := time.LoadLocation("America/Los_Angeles")
-	if err != nil {
-		panic(err)
-	}
-	denver, err := time.LoadLocation("America/Denver")
-	if err != nil {
-		panic(err)
-	}
-	newYork, err := time.LoadLocation("America/New_York")
-	if err != nil {
-		panic(err)
-	}
-	turkey, err := time.LoadLocation("Turkey")
+	cities, err := getCities()
 	if err != nil {
 		panic(err)
 	}
 
+	fmt.Printf("%v\n", *cities)
 	fmt.Fprintf(out, "%v\n\n", t.Format(time.UnixDate))
-
 	fmt.Fprintf(out, "UTC: %v\n", t.UTC().Format(time.UnixDate))
-	fmt.Fprintf(out, "Los Angeles: %v\n", t.In(losAngeles).Format(time.UnixDate))
-	fmt.Fprintf(out, "Denver: %v\n", t.In(denver).Format(time.UnixDate))
-	fmt.Fprintf(out, "New York: %v\n", t.In(newYork).Format(time.UnixDate))
-	fmt.Fprintf(out, "Turkey: %v\n", t.In(turkey).Format(time.UnixDate))
+	for _, c := range *cities {
+		fmt.Fprintf(out, "%s: %s\n", c.Name, t.In(c.Location).Format(time.UnixDate))
+	}
 }
 
 func main() {
