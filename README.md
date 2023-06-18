@@ -16,3 +16,19 @@ Denver: Sun Jun 18 13:45:32 MDT 2023
 New York: Sun Jun 18 15:45:32 EDT 2023
 Turkey: Sun Jun 18 22:45:32 +03 2023
 ```
+
+```
+❯ adamctl date "Sun Jun 18 13:18:41 PDT 2023"
+Sun Jun 18 13:18:41 PDT 2023
+
+UTC: Sun Jun 18 20:18:41 UTC 2023
+...
+```
+
+```
+❯ echo ""Sun Jun 18 13:18:41 PDT 2023"" | adamctl date
+Sun Jun 18 13:18:41 PDT 2023
+
+UTC: Sun Jun 18 20:18:41 UTC 2023
+...
+```

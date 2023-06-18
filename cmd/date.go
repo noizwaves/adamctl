@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -61,14 +63,30 @@ func run(out io.Writer, current time.Time, value string) error {
 	return nil
 }
 
-var value string
+func getValueArgument(stdin io.Reader, args []string) string {
+	value := ""
+	if len(args) > 0 {
+		value = args[0]
+	} else {
+		reader := bufio.NewReader(os.Stdin)
+		line, err := reader.ReadString('\n')
+		if err == nil {
+			value = strings.TrimSpace(line)
+		}
+	}
+	return value
+}
 
 var dateCmd = &cobra.Command{
-	Use:   "date",
+	Use:   "date [value]",
 	Short: "Print information about current date",
-	Long:  "A general purpose date parser and printer. Shows useful information about the date.",
+	Long: `A general purpose date parser and printer. Shows useful information about the date. By default shows current date.
+
+Optionally override date value used via argument.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
+		value := getValueArgument(os.Stdin, args)
+
 		err := run(os.Stdout, now, value)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v", err)
@@ -78,6 +96,4 @@ var dateCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(dateCmd)
-
-	dateCmd.Flags().StringVar(&value, "value", "", "A UnixDate formatted date to ingest, instead of current date.")
 }
