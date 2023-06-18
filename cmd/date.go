@@ -63,11 +63,11 @@ func run(out io.Writer, current time.Time, value string) error {
 	return nil
 }
 
-func getValueArgument(stdin io.Reader, args []string) string {
+func getValueArgument(stdin *os.File, args []string) string {
 	value := ""
 	if len(args) > 0 {
 		value = args[0]
-	} else {
+	} else if stat, _ := stdin.Stat(); (stat.Mode() & os.ModeCharDevice) == 0 {
 		reader := bufio.NewReader(os.Stdin)
 		line, err := reader.ReadString('\n')
 		if err == nil {
