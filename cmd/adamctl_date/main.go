@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -35,21 +36,37 @@ func getPlaces() (*[]place, error) {
 	return &cities, nil
 }
 
-func run(out io.Writer, t time.Time) {
-	places, err := getPlaces()
-	if err != nil {
-		panic(err)
+func run(out io.Writer, current time.Time, value string) error {
+	t := current
+	if value != "" {
+		var err error
+		t, err = time.Parse(time.UnixDate, value)
+		if err != nil {
+			return err
+		}
 	}
 
-	fmt.Printf("%v\n", *places)
+	places, err := getPlaces()
+	if err != nil {
+		return err
+	}
+
 	fmt.Fprintf(out, "%v\n\n", t.Format(time.UnixDate))
 	fmt.Fprintf(out, "UTC: %v\n", t.UTC().Format(time.UnixDate))
 	for _, p := range *places {
 		fmt.Fprintf(out, "%s: %s\n", p.Name, t.In(p.Location).Format(time.UnixDate))
 	}
+
+	return nil
 }
 
 func main() {
+	value := flag.String("value", "", "A UnixDate formatted date")
+	flag.Parse()
+
 	now := time.Now()
-	run(os.Stdout, now)
+	err := run(os.Stdout, now, *value)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v", err)
+	}
 }
