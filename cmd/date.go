@@ -1,11 +1,12 @@
-package main
+package cmd
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"os"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 type place struct {
@@ -60,13 +61,23 @@ func run(out io.Writer, current time.Time, value string) error {
 	return nil
 }
 
-func main() {
-	value := flag.String("value", "", "A UnixDate formatted date")
-	flag.Parse()
+var value string
 
-	now := time.Now()
-	err := run(os.Stdout, now, *value)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v", err)
-	}
+var dateCmd = &cobra.Command{
+	Use:   "date",
+	Short: "Print information about current date",
+	Long:  "A general purpose date parser and printer. Shows useful information about the date.",
+	Run: func(cmd *cobra.Command, args []string) {
+		now := time.Now()
+		err := run(os.Stdout, now, value)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v", err)
+		}
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(dateCmd)
+
+	dateCmd.Flags().StringVar(&value, "value", "", "A UnixDate formatted date to ingest, instead of current date.")
 }

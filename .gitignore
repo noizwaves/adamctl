@@ -9,7 +9,7 @@
 *.dylib
 
 # Repo specific binaries
-adamctl_date
+adamctl
 
 # Test binary, built with `go test -c`
 *.test
