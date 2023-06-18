@@ -1,11 +1,14 @@
-package main
+package cmd
 
 import (
-	"flag"
+	"bufio"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 type place struct {
@@ -60,13 +63,37 @@ func run(out io.Writer, current time.Time, value string) error {
 	return nil
 }
 
-func main() {
-	value := flag.String("value", "", "A UnixDate formatted date")
-	flag.Parse()
-
-	now := time.Now()
-	err := run(os.Stdout, now, *value)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v", err)
+func getValueArgument(stdin *os.File, args []string) string {
+	value := ""
+	if len(args) > 0 {
+		value = args[0]
+	} else if stat, _ := stdin.Stat(); (stat.Mode() & os.ModeCharDevice) == 0 {
+		reader := bufio.NewReader(os.Stdin)
+		line, err := reader.ReadString('\n')
+		if err == nil {
+			value = strings.TrimSpace(line)
+		}
 	}
+	return value
+}
+
+var dateCmd = &cobra.Command{
+	Use:   "date [value]",
+	Short: "Print information about current date",
+	Long: `A general purpose date parser and printer. Shows useful information about the date. By default shows current date.
+
+Optionally override date value used via argument.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		now := time.Now()
+		value := getValueArgument(os.Stdin, args)
+
+		err := run(os.Stdout, now, value)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v", err)
+		}
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(dateCmd)
 }
