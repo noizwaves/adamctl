@@ -26,7 +26,7 @@ UTC: Sun Jun 18 20:18:41 UTC 2023
 ```
 
 ```
-❯ echo ""Sun Jun 18 13:18:41 PDT 2023"" | adamctl date
+❯ echo "Sun Jun 18 13:18:41 PDT 2023" | adamctl date
 Sun Jun 18 13:18:41 PDT 2023
 
 UTC: Sun Jun 18 20:18:41 UTC 2023
