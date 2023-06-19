@@ -26,9 +26,18 @@ UTC: Sun Jun 18 20:18:41 UTC 2023
 ```
 
 ```
-❯ echo ""Sun Jun 18 13:18:41 PDT 2023"" | adamctl date
+❯ echo "Sun Jun 18 13:18:41 PDT 2023" | adamctl date
 Sun Jun 18 13:18:41 PDT 2023
 
 UTC: Sun Jun 18 20:18:41 UTC 2023
+...
+```
+
+Date strings are parsed using [araddon/dateparse](https://github.com/araddon/dateparse):
+```
+❯ go run main.go date "2012-08-03 18:31:59.257000000 +0000 UTC"
+Fri Aug  3 18:31:59 +0000 2012
+
+UTC: Fri Aug  3 18:31:59 UTC 2012
 ...
 ```
