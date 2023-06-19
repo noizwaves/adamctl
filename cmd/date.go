@@ -4,11 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/araddon/dateparse"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
 
@@ -53,6 +55,11 @@ func parseDate(s string) (time.Time, error) {
 	return dateparse.ParseLocal(s)
 }
 
+func formatOffset(offset int) string {
+	d := time.Second * time.Duration(offset)
+	return fmt.Sprintf("%+2.f:00", math.Round(d.Hours()))
+}
+
 func run(out io.Writer, current time.Time, value string) error {
 	t := current
 	if value != "" {
@@ -68,11 +75,31 @@ func run(out io.Writer, current time.Time, value string) error {
 		return err
 	}
 
-	fmt.Fprintf(out, "%v\n\n", t.Format(time.UnixDate))
-	fmt.Fprintf(out, "UTC: %v\n", t.UTC().Format(time.UnixDate))
+	tab := table.NewWriter()
+	tab.SetTitle("The time in various places")
+	tab.SetStyle(table.StyleColoredCyanWhiteOnBlack)
+
+	tab.AppendHeader(table.Row{"Place", "Offset", "Date"})
+
+	_, offsetRaw := t.Zone()
+	tab.AppendRow(table.Row{"Raw", formatOffset(offsetRaw), t.Format(time.UnixDate)})
+
+	tLocal := t.In(time.Local)
+	_, offsetLocal := tLocal.Zone()
+	tab.AppendRow(table.Row{"Local", formatOffset(offsetLocal), tLocal.Format(time.UnixDate)})
+
+	tUtc := t.In(time.UTC)
+	_, offsetUtc := tUtc.Zone()
+	tab.AppendRow(table.Row{"UTC", formatOffset(offsetUtc), tUtc.Format(time.UnixDate)})
+
 	for _, p := range *places {
-		fmt.Fprintf(out, "%s: %s\n", p.Name, t.In(p.Location).Format(time.UnixDate))
+		tIn := t.In(p.Location)
+		_, offset := tIn.Zone()
+		tab.AppendRow(table.Row{p.Name, formatOffset(offset), tIn.Format(time.UnixDate)})
 	}
+
+	tab.SetOutputMirror(out)
+	tab.Render()
 
 	return nil
 }
