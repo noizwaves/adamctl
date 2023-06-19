@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/araddon/dateparse"
 	"github.com/spf13/cobra"
 )
 
@@ -39,11 +40,24 @@ func getPlaces() (*[]place, error) {
 	return &cities, nil
 }
 
+func location(name string) *time.Location {
+	l, err := time.LoadLocation(name)
+	if err != nil {
+		panic(err)
+	}
+
+	return l
+}
+
+func parseDate(s string) (time.Time, error) {
+	return dateparse.ParseLocal(s)
+}
+
 func run(out io.Writer, current time.Time, value string) error {
 	t := current
 	if value != "" {
 		var err error
-		t, err = time.Parse(time.UnixDate, value)
+		t, err = dateparse.ParseLocal(value)
 		if err != nil {
 			return err
 		}
