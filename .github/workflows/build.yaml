@@ -27,7 +27,7 @@ jobs:
       - name: Build artifacts
         id: build_artifacts
         if: ${{ github.ref_name == 'main' }}
-        run: >
+        run: |
           GOOS=darwin GOARCH=amd64 go build -o build/adamctl-darwin-amd64 . &&
           GOOS=darwin GOARCH=arm64 go build -o build/adamctl-darwin-arm64 . &&
           GOOS=linux GOARCH=amd64 go build -o build/adamctl-linux-amd64 . &&
@@ -35,6 +35,11 @@ jobs:
 
       - name: Release
         id: release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: output/**/*
+        run: |
+          SHA="${{ github.sha }}"
+          VERSION=${SHA:0:8}
+          TAG=v-$VERSION
+          git tag "$TAG"
+          git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
