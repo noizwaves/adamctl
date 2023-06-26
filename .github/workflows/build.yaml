@@ -33,21 +33,8 @@ jobs:
           GOOS=linux GOARCH=amd64 go build -o build/adamctl-linux-amd64 . &&
           GOOS=linux GOARCH=arm64 go build -o build/adamctl-linux-arm64 .
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release
+        id: release
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: true
-
-      - name: Upload release artifacts
-        id: upload_artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-output
-          if-no-files-found: error
-          path: output/**/*
+          files: output/**/*
