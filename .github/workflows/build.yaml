@@ -52,12 +52,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
+          DEFAULT_BUMP: patch
 
       - name: Release
         id: create-release
         run: |
           TAG="${{ steps.tag_version.outputs.new_tag }}"
           gh release create "$TAG" --generate-notes
-          gh release upload "$TAG" build/**/*
+          gh release upload "$TAG" build/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
