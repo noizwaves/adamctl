@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var mdt = time.FixedZone("MDT", -6*60*60)
@@ -38,9 +40,7 @@ func TestRun(t *testing.T) {
 		" New York     -4:00   Fri Jun  9 18:22:45 EDT 2023 \n" +
 		" Turkey       +3:00   Sat Jun 10 01:22:45 +03 2023 \n"
 
-	if expected != actual {
-		t.Errorf("Expected %v but received %v", expected, actual)
-	}
+	assert.Equal(t, expected, actual)
 }
 
 func TestRunValidDateValue(t *testing.T) {
@@ -65,7 +65,5 @@ func TestRunValidDateValue(t *testing.T) {
 		" New York     -4:00   Sat Jun 17 17:44:25 EDT 2023 \n" +
 		" Turkey       +3:00   Sun Jun 18 00:44:25 +03 2023 \n"
 
-	if expected != actual {
-		t.Errorf("Expected %v but received %v", expected, actual)
-	}
+	assert.Equal(t, expected, actual)
 }
