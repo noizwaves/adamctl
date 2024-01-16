@@ -60,13 +60,25 @@ func formatOffset(offset int) string {
 	return fmt.Sprintf("%+2.f:00", math.Round(d.Hours()))
 }
 
-func run(out io.Writer, current time.Time, value string) error {
+func run(out io.Writer, current time.Time, value string, tz string) error {
 	t := current
 	if value != "" {
 		var err error
-		t, err = dateparse.ParseLocal(value)
-		if err != nil {
-			return err
+		if tz != "" {
+			loc, err := time.LoadLocation(tz)
+			if err != nil {
+				return err
+			}
+
+			t, err = dateparse.ParseIn(value, loc)
+			if err != nil {
+				return err
+			}
+		} else {
+			t, err = dateparse.ParseLocal(value)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -124,11 +136,18 @@ var dateCmd = &cobra.Command{
 	Long: `A general purpose date parser and printer. Shows useful information about the date. By default shows current date.
 
 Optionally override date value used via argument.`,
+	Args: cobra.RangeArgs(0, 1),
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 		value := getValueArgument(os.Stdin, args)
+		tz, err := cmd.Flags().GetString("tz")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v", err)
 
-		err := run(os.Stdout, now, value)
+			return
+		}
+
+		err = run(os.Stdout, now, value, tz)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v", err)
 		}
@@ -136,5 +155,7 @@ Optionally override date value used via argument.`,
 }
 
 func init() {
+	dateCmd.Flags().String("tz", "", "contextually parse dates in this timezone instead")
+
 	rootCmd.AddCommand(dateCmd)
 }

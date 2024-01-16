@@ -6,6 +6,7 @@ My professional swiss army knife / toolkit.
 
 ### `date`
 
+By default, the current system date is returned:
 ```
 ❯ adamctl date
  The time in various places
@@ -19,6 +20,7 @@ My professional swiss army knife / toolkit.
  Turkey       +3:00   Sun Jun 18 22:45:32 +03 2023
 ```
 
+A specific date string can be provided as an argument:
 ```
 ❯ adamctl date "Sun Jun 18 13:18:41 PDT 2023"
  The time in various places
@@ -29,6 +31,7 @@ My professional swiss army knife / toolkit.
 ...
 ```
 
+Or via a pipe:
 ```
 ❯ echo "Sun Jun 18 13:18:41 PDT 2023" | adamctl date
  The time in various places
@@ -38,6 +41,19 @@ My professional swiss army knife / toolkit.
  UTC          +0:00   Sun Jun 18 20:18:41 UTC 2023
 ...
 ```
+
+If a date string is missing timezone information, supply it with `--tz`:
+```
+❯ adamctl date "Sun Jun 18 13:18:41 2023" --tz=UTC
+ The time in various places
+ PLACE        OFFSET  DATE
+ Raw          -7:00   Sun Jun 18 13:18:41 UTC 2023
+ Local        -7:00   Sun Jun 18 06:18:41 PDT 2023
+ UTC          +0:00   Sun Jun 18 13:18:41 UTC 2023
+...
+```
+
+#### Date parsing
 
 Date strings are parsed using [araddon/dateparse](https://github.com/araddon/dateparse):
 ```
