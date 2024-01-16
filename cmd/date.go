@@ -136,6 +136,7 @@ var dateCmd = &cobra.Command{
 	Long: `A general purpose date parser and printer. Shows useful information about the date. By default shows current date.
 
 Optionally override date value used via argument.`,
+	Args: cobra.RangeArgs(0, 1),
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 		value := getValueArgument(os.Stdin, args)
@@ -154,7 +155,7 @@ Optionally override date value used via argument.`,
 }
 
 func init() {
-	dateCmd.Flags().String("tz", "", "Contextually parse dates in this timezone instead")
+	dateCmd.Flags().String("tz", "", "contextually parse dates in this timezone instead")
 
 	rootCmd.AddCommand(dateCmd)
 }
