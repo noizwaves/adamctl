@@ -65,3 +65,27 @@ Date strings are parsed using [araddon/dateparse](https://github.com/araddon/dat
  UTC          +0:00   Fri Aug  3 18:31:59 UTC 2012
 ...
 ```
+
+### `cidrmap`
+
+Maps an input IP address to an output value based on the configured mapping:
+```
+❯ adamctl cidrmap --map '192.168.0.0/24: foo' 192.168.0.1
+foo
+
+❯ adamctl cidrmap --map '{192.168.0.0/24: foo, 192.168.1.0/24: bar}' 192.168.0.1 192.168.1.1
+foo
+bar
+```
+
+Mapping can come from a file:
+```
+❯ adamctl cidrmap --path map.yaml 192.168.0.1
+foo
+```
+
+Addresses can be from STDIN:
+```
+❯ echo 192.168.0.1 | adamctl cidrmap --path map.yaml
+foo
+```
