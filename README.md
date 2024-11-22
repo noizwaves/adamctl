@@ -2,6 +2,10 @@
 
 My professional swiss army knife / toolkit.
 
+## Setup
+
+1. `./setup.sh` to install dependencies using Mise
+
 ## Usage
 
 ### `date`
