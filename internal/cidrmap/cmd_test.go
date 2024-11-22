@@ -1,4 +1,4 @@
-package cmd
+package cidrmap
 
 import (
 	"bytes"
@@ -26,7 +26,7 @@ func TestCidrmapRun(t *testing.T) {
 		},
 	}
 
-	err := cidrmapRun(inputs, mappings, &out)
+	err := Run(inputs, mappings, &out)
 
 	assert.NoError(t, err)
 
