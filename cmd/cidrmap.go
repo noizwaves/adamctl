@@ -3,42 +3,13 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"net"
 	"os"
 
+	"github.com/noizwaves/adamctl/internal/cidrmap"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
-
-type Mapping struct {
-	cidr  net.IPNet
-	value string
-}
-
-type Mappings = []Mapping
-
-func cidrmapRun(inputs []net.IP, mappings *Mappings, out io.Writer) error {
-	for _, input := range inputs {
-		err := checkAddress(input, mappings, out)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func checkAddress(input net.IP, mappings *Mappings, out io.Writer) error {
-	for _, mapping := range *mappings {
-		if mapping.cidr.Contains(input) {
-			fmt.Fprintf(out, "%s\n", mapping.value)
-			return nil
-		}
-	}
-
-	return fmt.Errorf("no mapping found for %s\n", input)
-}
 
 func parseInput(inputs []string) ([]net.IP, error) {
 	output := make([]net.IP, 0)
@@ -71,7 +42,7 @@ func loadInputs(stdin *os.File, args []string) ([]net.IP, error) {
 
 type mappingDto = map[string]string
 
-func loadMappings(path string, raw string) (*Mappings, error) {
+func loadMappings(path string, raw string) (*cidrmap.Mappings, error) {
 	if path != "" {
 		data, err := os.ReadFile(path)
 		if err != nil {
@@ -84,7 +55,7 @@ func loadMappings(path string, raw string) (*Mappings, error) {
 	return parseMappings(raw)
 }
 
-func parseMappings(raw string) (*Mappings, error) {
+func parseMappings(raw string) (*cidrmap.Mappings, error) {
 	var dto mappingDto
 
 	err := yaml.Unmarshal([]byte(raw), &dto)
@@ -92,13 +63,13 @@ func parseMappings(raw string) (*Mappings, error) {
 		return nil, err
 	}
 
-	output := make(Mappings, 0)
+	output := make(cidrmap.Mappings, 0)
 	for k, v := range dto {
 		_, cidr, err := net.ParseCIDR(k)
 		if err != nil {
 			return nil, err
 		}
-		output = append(output, Mapping{cidr: *cidr, value: v})
+		output = append(output, cidrmap.NewMapping(*cidr, v))
 	}
 
 	return &output, nil
@@ -108,7 +79,6 @@ var cidrmapCmd = &cobra.Command{
 	Use:   "cidrmap [value]",
 	Short: "Map IP Address to Value",
 	Long:  `Map IP Addresses to values based upon a configured mapping`,
-	// Args:  cobra.Arg,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		input, err := loadInputs(os.Stdin, args)
 		if err != nil {
@@ -129,7 +99,7 @@ var cidrmapCmd = &cobra.Command{
 			return err
 		}
 
-		err = cidrmapRun(input, mappings, os.Stdout)
+		err = cidrmap.Run(input, mappings, os.Stdout)
 		if err != nil {
 			return err
 		}

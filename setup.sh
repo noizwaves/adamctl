@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-yes | goenv install --skip-existing
+mise install
 
 go install golang.org/x/tools/gopls@latest

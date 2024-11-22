@@ -1,4 +1,4 @@
-package cmd
+package date
 
 import (
 	"bytes"
@@ -22,7 +22,7 @@ func TestRun(t *testing.T) {
 	now := time.Date(2023, time.June, 9, 16, 22, 45, 0, mdt)
 	var out bytes.Buffer
 
-	err := run(&out, now, "", "")
+	err := Run(&out, now, "", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +47,7 @@ func TestRunValidDateValue(t *testing.T) {
 	now := time.Date(2023, time.June, 9, 16, 22, 45, 0, mdt)
 	var out bytes.Buffer
 
-	err := run(&out, now, "Sat Jun 17 14:44:25 PDT 2023", "")
+	err := Run(&out, now, "Sat Jun 17 14:44:25 PDT 2023", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestRunSpecifyTimezone(t *testing.T) {
 	now := time.Date(2023, time.June, 9, 16, 22, 45, 0, mdt)
 	var out bytes.Buffer
 
-	err := run(&out, now, "Sat Jun 17 14:44:25 2023", "UTC")
+	err := Run(&out, now, "Sat Jun 17 14:44:25 2023", "UTC")
 	if err != nil {
 		t.Fatal(err)
 	}
