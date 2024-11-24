@@ -72,24 +72,30 @@ Date strings are parsed using [araddon/dateparse](https://github.com/araddon/dat
 
 ### `cidrmap`
 
-Maps an input IP address to an output value based on the configured mapping:
+Maps an input IP address to an output value based on a mapping:
 ```
 ❯ adamctl cidrmap --map '192.168.0.0/24: foo' 192.168.0.1
-foo
+192.168.0.1: foo
 
 ❯ adamctl cidrmap --map '{192.168.0.0/24: foo, 192.168.1.0/24: bar}' 192.168.0.1 192.168.1.1
-foo
-bar
+192.168.0.1: foo
+192.168.1.1: bar
 ```
 
 Mapping can come from a file:
 ```
 ❯ adamctl cidrmap --path map.yaml 192.168.0.1
-foo
+192.168.0.1: foo
 ```
 
 Addresses can be from STDIN:
 ```
 ❯ echo 192.168.0.1 | adamctl cidrmap --path map.yaml
-foo
+192.168.0.1: foo
+```
+
+Output format can be configured:
+```
+❯ echo 192.168.0.1 | adamctl cidrmap --path map.yaml --format "{{.IP}} maps to {{.Value}}"
+192.168.0.1 maps to foo
 ```

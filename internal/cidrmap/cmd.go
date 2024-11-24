@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"text/template"
 )
 
 type Mapping struct {
@@ -15,9 +16,9 @@ type Mappings = []Mapping
 
 type Inputs = []net.IP
 
-func Run(inputs Inputs, mappings *Mappings, out io.Writer) error {
+func Run(inputs Inputs, mappings *Mappings, format *template.Template, out io.Writer) error {
 	for _, input := range inputs {
-		err := checkAddress(input, mappings, out)
+		err := mapAddress(input, mappings, format, out)
 		if err != nil {
 			return err
 		}
@@ -26,10 +27,21 @@ func Run(inputs Inputs, mappings *Mappings, out io.Writer) error {
 	return nil
 }
 
-func checkAddress(input net.IP, mappings *Mappings, out io.Writer) error {
+func mapAddress(input net.IP, mappings *Mappings, format *template.Template, out io.Writer) error {
 	for _, mapping := range *mappings {
 		if mapping.cidr.Contains(input) {
-			fmt.Fprintf(out, "%s\n", mapping.value)
+			data := struct {
+				IP    string
+				Value string
+			}{input.String(), mapping.value}
+
+			err := format.Execute(out, data)
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintln(out)
+
 			return nil
 		}
 	}

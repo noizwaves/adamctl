@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"text/template"
 
 	"github.com/noizwaves/adamctl/internal/cidrmap"
 	"github.com/spf13/cobra"
@@ -75,10 +76,25 @@ func parseMappings(raw string) (*cidrmap.Mappings, error) {
 	return &output, nil
 }
 
+func loadFormat(cmd *cobra.Command) (*template.Template, error) {
+	raw, err := cmd.Flags().GetString("format")
+	if err != nil {
+		return nil, err
+	}
+
+	t, err := template.New("output").Parse(raw)
+	if err != nil {
+		return nil, err
+	}
+
+	return t, nil
+}
+
 var cidrmapCmd = &cobra.Command{
-	Use:   "cidrmap [value]",
-	Short: "Map IP Address to Value",
-	Long:  `Map IP Addresses to values based upon a configured mapping`,
+	Use:          "cidrmap [value]",
+	Short:        "Map IP Address to Value",
+	Long:         `Map IP Addresses to values based upon a configured mapping`,
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		input, err := loadInputs(os.Stdin, args)
 		if err != nil {
@@ -99,7 +115,12 @@ var cidrmapCmd = &cobra.Command{
 			return err
 		}
 
-		err = cidrmap.Run(input, mappings, os.Stdout)
+		format, err := loadFormat(cmd)
+		if err != nil {
+			return err
+		}
+
+		err = cidrmap.Run(input, mappings, format, os.Stdout)
 		if err != nil {
 			return err
 		}
@@ -111,6 +132,7 @@ var cidrmapCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(cidrmapCmd)
 
-	cidrmapCmd.Flags().String("mapping", "", "YAML formatted CIDR-to-value mapping")
-	cidrmapCmd.Flags().String("path", "", "Path to mappings YAML file")
+	cidrmapCmd.Flags().StringP("mapping", "m", "", "YAML formatted CIDR-to-value mapping")
+	cidrmapCmd.Flags().StringP("path", "p", "", "Path to mappings YAML file")
+	cidrmapCmd.Flags().StringP("format", "f", "{{.IP}}: {{.Value}}", "Output format string as a Go template (available fields: IP, Value)")
 }
