@@ -132,7 +132,7 @@ var cidrmapCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(cidrmapCmd)
 
-	cidrmapCmd.Flags().String("mapping", "", "YAML formatted CIDR-to-value mapping")
-	cidrmapCmd.Flags().String("path", "", "Path to mappings YAML file")
-	cidrmapCmd.Flags().String("format", "{{.IP}}: {{.Value}}", "Output format string as a Go template (available fields: IP, Value)")
+	cidrmapCmd.Flags().StringP("mapping", "m", "", "YAML formatted CIDR-to-value mapping")
+	cidrmapCmd.Flags().StringP("path", "p", "", "Path to mappings YAML file")
+	cidrmapCmd.Flags().StringP("format", "f", "{{.IP}}: {{.Value}}", "Output format string as a Go template (available fields: IP, Value)")
 }
