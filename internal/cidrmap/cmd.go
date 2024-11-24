@@ -40,7 +40,7 @@ func checkAddress(input net.IP, mappings *Mappings, format *template.Template, o
 				return err
 			}
 
-			fmt.Println()
+			fmt.Fprintln(out)
 
 			return nil
 		}

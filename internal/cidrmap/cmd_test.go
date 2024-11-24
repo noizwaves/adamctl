@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net"
 	"testing"
+	"text/template"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -26,7 +27,9 @@ func TestCidrmapRun(t *testing.T) {
 		},
 	}
 
-	err := Run(inputs, mappings, &out)
+	format, _ := template.New("test-format").Parse("{{.Value}}")
+
+	err := Run(inputs, mappings, format, &out)
 
 	assert.NoError(t, err)
 
