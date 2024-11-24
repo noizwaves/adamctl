@@ -18,7 +18,7 @@ type Inputs = []net.IP
 
 func Run(inputs Inputs, mappings *Mappings, format *template.Template, out io.Writer) error {
 	for _, input := range inputs {
-		err := checkAddress(input, mappings, format, out)
+		err := mapAddress(input, mappings, format, out)
 		if err != nil {
 			return err
 		}
@@ -27,7 +27,7 @@ func Run(inputs Inputs, mappings *Mappings, format *template.Template, out io.Wr
 	return nil
 }
 
-func checkAddress(input net.IP, mappings *Mappings, format *template.Template, out io.Writer) error {
+func mapAddress(input net.IP, mappings *Mappings, format *template.Template, out io.Writer) error {
 	for _, mapping := range *mappings {
 		if mapping.cidr.Contains(input) {
 			data := struct {
